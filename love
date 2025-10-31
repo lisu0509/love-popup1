@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>温馨提示</title>
+    <style>
+        /* 弹窗样式 */
+        .popup {
+            position: fixed;
+            width: 250px;
+            height: 60px;
+            line-height: 60px;
+            text-align: center;
+            font-family: "微软雅黑", sans-serif;
+            font-size: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 9999; /* 置顶 */
+            cursor: pointer;
+        }
+        /* 关闭按钮样式（可选） */
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // 温馨提示文字列表
+        const tips = [
+            '多喝水哦~', '保持微笑呀', '每天都要元气满满',
+            '记得吃水果', '保持好心情', '好好爱自己', '我想你了',
+            '梦想成真', '期待下一次见面', '金榜题名',
+            '顺顺利利', '早点休息', '愿所有烦恼都消失',
+            '别熬夜', '今天过得开心嘛', '天冷了，多穿衣服'
+        ];
+        // 背景色列表（和Python版一致）
+        const bgColors = [
+            'lightpink', 'skyblue', 'lightgreen', 'lavender',
+            'lightyellow', 'plum', 'coral', 'bisque', 'aquamarine',
+            'mistyrose', 'honeydew', 'lavenderblush', 'oldlace'
+        ];
+
+        // 生成随机位置（确保弹窗在屏幕内）
+        function getRandomPos(width, height) {
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            const x = Math.floor(Math.random() * (screenWidth - width));
+            const y = Math.floor(Math.random() * (screenHeight - height));
+            return { x, y };
+        }
+
+        // 创建单个弹窗
+        function createPopup(text, isFirst = false) {
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.textContent = text;
+            // 随机背景色
+            popup.style.backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+            // 随机位置
+            const { x, y } = getRandomPos(250, 60);
+            popup.style.left = `${x}px`;
+            popup.style.top = `${y}px`;
+
+            // 关闭弹窗逻辑
+            function closePopup() {
+                popup.remove();
+                // 如果是第一个弹窗，关闭后批量生成300个
+                if (isFirst) {
+                    batchCreatePopups(300);
+                }
+            }
+
+            // 点击弹窗关闭
+            popup.addEventListener('click', closePopup);
+            // 按空格键关闭所有弹窗
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    document.querySelectorAll('.popup').forEach(p => p.remove());
+                }
+            });
+
+            document.body.appendChild(popup);
+        }
+
+        // 批量创建弹窗（核心修改：把间隔从5毫秒改成30毫秒，300个约9秒弹完）
+        function batchCreatePopups(count) {
+            let index = 0;
+            // 间隔时间：30毫秒/个（可按需调整，越大越慢）
+            const interval = setInterval(() => {
+                if (index >= count) {
+                    clearInterval(interval);
+                    return;
+                }
+                const randomTip = tips[Math.floor(Math.random() * tips.length)];
+                createPopup(randomTip);
+                index++;
+            }, 30); // 这里是弹出速度控制，之前是5，现在改成30
+        }
+
+        // 程序启动：先创建第一个弹窗（固定显示“我喜欢你”）
+        window.onload = () => {
+            createPopup('我喜欢你', true);
+        };
+    </script>
+</body>
+</html>
